@@ -1,35 +1,30 @@
-// ignore_for_file: prefer_const_constructors, library_prefixes
-//ed:3a:9b:46:d2:90:06:9c:96:50:32:51:cd:07:3a:dc:4f:15:e0:e5
+// ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
-import 'pages/welcome.dart';
-import 'package:on_spot_mechanic/authentication/auth_provider.dart'
-    as MyAppAuthProvider;
+import 'pages/authentication_module/welcome.dart';
+import 'package:on_spot_mechanic/providers/auth_provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensures that Flutter has been initialized before initializing Firebase.
-
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MyAppAuthProvider.AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthorizationProvider()),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: WelcomePage(),
         title: "FlutterPhoneAuth",
@@ -37,3 +32,11 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// class CheckUserLoggedIn extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     final AuthorizationProvider = Provider.of<AuthorizationProvider>(context);
+//     return AuthorizationProvider.isSignedIn ? UserHomeScreen() : WelcomePage();
+//   }
+// }

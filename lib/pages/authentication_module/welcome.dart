@@ -1,11 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/pages/profile_selection_page.dart';
+import 'package:on_spot_mechanic/pages/user_module/user_home.dart';
 import 'package:provider/provider.dart';
 
-import '../authentication/auth_provider.dart';
-import '../utils/button.dart';
+import '../../providers/auth_provider.dart';
+import '../../utils/button.dart';
 import 'registration.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -18,7 +18,7 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
-    final ap = Provider.of<AuthProvider>(context, listen: false);
+    final ap = Provider.of<AuthorizationProvider>(context, listen: false);
     return Scaffold(
       body: SafeArea(
           child: Center(
@@ -50,17 +50,19 @@ class _WelcomePageState extends State<WelcomePage> {
                 width: double.infinity,
                 child: CustomButton(
                   text: 'Sign Up',
-                  onPressed: () {
-                    ap.isSignedIn == true
-                        ? Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ProfileSelectionPage()))
-                        : Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Registration()),
-                          );
+                  onPressed: () async {
+                    if (ap.isSignedIn == true) {
+                      await ap.getDataFromSP().whenComplete(() =>
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UserHomeScreen())));
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Registration()));
+                    }
                   },
                 ),
               ),

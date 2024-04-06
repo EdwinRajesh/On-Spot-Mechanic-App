@@ -1,13 +1,13 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/pages/welcome.dart';
+import 'package:on_spot_mechanic/pages/authentication_module/welcome.dart';
 
-import '../utils/colors.dart';
-import '../utils/utils.dart';
-import 'mechanic_profile.dart';
-import 'user_profile.dart';
+import '../../utils/colors.dart';
+import '../../utils/utils.dart';
+import '../mechanic_module/mechanic_profile.dart';
+import '../user_module/user_profile.dart';
 
 class ProfileSelectionPage extends StatefulWidget {
   const ProfileSelectionPage({super.key});
@@ -63,29 +63,26 @@ class _ProfileSelectionPageState extends State<ProfileSelectionPage> {
               },
               child: Column(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: primaryColor,
-                    radius: 56,
+                  Container(
+                    width: 176,
+                    height: 56,
+                    decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(8)),
                     child: Center(
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 80,
+                      child: Text(
+                        'USER',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'USER',
-                    style: TextStyle(
-                      color: tertiaryColor,
-                      fontSize: 30,
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 40),
+            SizedBox(height: 32),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -95,25 +92,20 @@ class _ProfileSelectionPageState extends State<ProfileSelectionPage> {
               },
               child: Column(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: primaryColor,
-                    radius: 56,
+                  Container(
+                    width: 176,
+                    height: 56,
+                    decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(8)),
                     child: Center(
-                      child: Icon(
-                        Icons.car_repair,
-                        color: Colors.white,
-                        size: 80,
+                      child: Text(
+                        'MECHANIC',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    'MECHANIC',
-                    style: TextStyle(
-                      color: tertiaryColor,
-                      fontSize: 30,
                     ),
                   ),
                 ],

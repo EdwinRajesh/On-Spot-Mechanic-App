@@ -1,33 +1,29 @@
 // ignore_for_file: prefer_const_constructors
 
-// ignore: unused_import
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/pages/registration.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:on_spot_mechanic/pages/authentication_module/login.dart';
+import 'package:on_spot_mechanic/pages/authentication_module/welcome.dart';
+import 'package:on_spot_mechanic/providers/auth_provider.dart'
+    as MyAppAuthorizationProvider;
 import 'package:provider/provider.dart';
-import '../authentication/auth_provider.dart' as MyAppAuthProvider;
-import '../utils/button.dart';
-import '../utils/colors.dart';
-import '../utils/utils.dart';
-import 'welcome.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../../utils/button.dart';
+import '../../utils/colors.dart';
+import '../../utils/utils.dart';
+
+class Registration extends StatefulWidget {
+  const Registration({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<Registration> createState() => _RegistrationState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  bool isValidPhone = false;
-
+class _RegistrationState extends State<Registration> {
+  FirebaseAuth auth = FirebaseAuth.instance;
   TextEditingController phoneController = TextEditingController();
 
-  bool isNumeric(String text) {
-    RegExp numericRegex = RegExp(r'^[0-9]+$');
-    return numericRegex.hasMatch(text);
-  }
+  bool isValidPhone = false;
 
   void updateValidity() {
     setState(() {
@@ -36,58 +32,17 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  Future<void> _login(BuildContext context) async {
-    final String phoneNumber = phoneController.text.trim();
-
-    final QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .where('phoneNumber', isEqualTo: phoneNumber)
-            .get();
-
-    if (!querySnapshot.docs.isNotEmpty) {
-      sendPhoneNumber();
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Phone number is not registered.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  Future<bool> checkUserExists(String phoneNumber) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('phoneNumber', isEqualTo: phoneNumber)
-        .get();
-
-    return querySnapshot.docs.isNotEmpty;
+  bool isNumeric(String text) {
+    RegExp numericRegex = RegExp(r'^[0-9]+$');
+    return numericRegex.hasMatch(text);
   }
 
   void sendPhoneNumber() {
-    final ap =
-        Provider.of<MyAppAuthProvider.AuthProvider>(context, listen: false);
+    final ap = Provider.of<MyAppAuthorizationProvider.AuthorizationProvider>(
+        context,
+        listen: false);
     String phoneNumber = phoneController.text.trim();
     ap.signInWithPhone(context, "+91$phoneNumber");
-  }
-
-  void checkUserExistsFunction() async {
-    String phoneNumber = phoneController.text.trim();
-    bool userExists = await checkUserExists(phoneNumber);
-    if (userExists) {
-      sendPhoneNumber();
-    } else {
-      showSnackBar(context, "You have'nt  registered yet!");
-    }
   }
 
   @override
@@ -99,7 +54,10 @@ class _LoginPageState extends State<LoginPage> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => WelcomePage()));
             },
-            icon: Icon(Icons.arrow_back)),
+            icon: Icon(
+              Icons.arrow_back,
+              color: secondaryColor,
+            )),
       ),
       body: SafeArea(
         child: Center(
@@ -110,12 +68,15 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Login',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  'Registration',
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: secondaryColor),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Login to your account to access our services',
+                  'Add your phone number. We\'ll send you an authentication code',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -141,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                     // ignore: prefer_const_literals_to_create_immutables
                     children: [
                       Text(
-                        "Not registered yet?",
+                        "Have an account?",
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.black38,
@@ -156,10 +117,10 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Registration()));
+                                  builder: (context) => LoginPage()));
                         },
                         child: Text(
-                          'Sign Up',
+                          'Sign In',
                           style: TextStyle(
                             fontSize: 18,
                             color: primaryColor,
@@ -197,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 13, 10, 13)),
+                  color: secondaryColor),
             ),
           ),
           suffixIcon: isValidPhone
@@ -223,10 +184,10 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: CustomButton(
-        text: 'Sign In',
+        text: 'Register',
         onPressed: () {
           isValidPhone
-              ? _login(context)
+              ? sendPhoneNumber()
               : showSnackBar(context, "Invalid Number");
         },
       ),

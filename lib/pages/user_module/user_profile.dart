@@ -1,15 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/authentication/auth_provider.dart';
-import 'package:on_spot_mechanic/pages/user_home.dart';
+import 'package:on_spot_mechanic/providers/auth_provider.dart';
+import 'package:on_spot_mechanic/pages/user_module/user_home.dart';
 
 import 'package:provider/provider.dart';
 
-import '../models/user_models.dart';
-import '../utils/button.dart';
-import '../utils/colors.dart';
-import '../utils/signup_textfield.dart';
+import '../../models/user_models.dart';
+import '../../utils/button.dart';
+import '../../utils/colors.dart';
+import '../../utils/signup_textfield.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -29,7 +29,7 @@ class _UserProfileState extends State<UserProfile> {
           leading: GestureDetector(
             child: Icon(Icons.arrow_back),
             onTap: () {
-              AuthProvider auth = AuthProvider();
+              AuthorizationProvider auth = AuthorizationProvider();
               auth.userSignOut();
             },
           ),
@@ -71,13 +71,6 @@ class _UserProfileState extends State<UserProfile> {
                 SizedBox(
                   height: 16,
                 ),
-                // SignTextField(
-                //     hintText: "Phone Number",
-                //     controller: phoneController,
-                //     icon: Icons.phone),
-                // SizedBox(
-                //   height: 16,
-                // ),
                 CustomButton(
                     text: "SIGN UP",
                     onPressed: () {
@@ -90,7 +83,7 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void storeData() async {
-    final ap = Provider.of<AuthProvider>(context, listen: false);
+    final ap = Provider.of<AuthorizationProvider>(context, listen: false);
     UserModel userModel = UserModel(
         email: emailController.text.trim(),
         name: nameController.text.trim(),

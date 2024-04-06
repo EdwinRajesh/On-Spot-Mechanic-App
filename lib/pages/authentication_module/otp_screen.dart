@@ -1,16 +1,16 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/pages/profile_selection_page.dart';
+import 'package:on_spot_mechanic/pages/authentication_module/profile_selection_page.dart';
 
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 
-import '../authentication/auth_provider.dart';
-import '../utils/button.dart';
-import '../utils/colors.dart';
-import '../utils/utils.dart';
-import 'user_home.dart';
+import '../../providers/auth_provider.dart';
+import '../../utils/button.dart';
+import '../../utils/colors.dart';
+import '../../utils/utils.dart';
+import '../user_module/user_home.dart';
 
 class OtpScreen extends StatefulWidget {
   final String verificationId;
@@ -26,7 +26,7 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading =
-        Provider.of<AuthProvider>(context, listen: true).isLoading;
+        Provider.of<AuthorizationProvider>(context, listen: true).isLoading;
     return Scaffold(
       body: SafeArea(
         child: isLoading == true
@@ -129,7 +129,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void verifyOtp(BuildContext context, String otpCode, String verificationId) {
-    final ap = Provider.of<AuthProvider>(context, listen: false);
+    final ap = Provider.of<AuthorizationProvider>(context, listen: false);
     ap.verifyOtp(
       context: context,
       verificationId: verificationId,
@@ -138,13 +138,22 @@ class _OtpScreenState extends State<OtpScreen> {
         ap.checkExistingUser().then((value) => {
               if (value == true)
                 {
-                  print('user exists'),
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => UserHomeScreen()))
+                  ap.getDataFromFirestore().then(
+                        (value) => ap.saveUserDataToSP().then(
+                              (value) => ap.setSignIn().then(
+                                    (value) => Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const UserHomeScreen(),
+                                        ),
+                                        (route) => false),
+                                  ),
+                            ),
+                      )
                 }
               else
                 {
-                  print('user not exists'),
                   Navigator.push(
                       context,
                       MaterialPageRoute(
