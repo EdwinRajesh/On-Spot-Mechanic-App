@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:on_spot_mechanic/providers/auth_provider.dart'
     as MyAppAuthorizationProvider;
 
+import '../chat_bot.dart';
+
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
 
@@ -24,38 +26,38 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     String name = ap.userModel.name.split(' ')[0];
     String userName = name[0].toUpperCase() + name.substring(1);
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.menu,
-              color: secondaryColor,
-              size: 32,
-            ),
-            onPressed: () {},
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.menu,
+            color: secondaryColor,
+            size: 32,
           ),
-          actions: [
-            GestureDetector(
-              child: IconButton(
-                icon: Icon(
-                  Icons.exit_to_app,
-                  color: secondaryColor,
-                  size: 24,
-                ),
-                onPressed: () {
-                  ap.userSignOut();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => WelcomePage()),
-                  );
-                },
-              ),
-            ),
-          ],
+          onPressed: () {},
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Center(
-              child: Column(
+        actions: [
+          GestureDetector(
+            child: IconButton(
+              icon: Icon(
+                Icons.exit_to_app,
+                color: secondaryColor,
+                size: 24,
+              ),
+              onPressed: () {
+                ap.userSignOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => WelcomePage()),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Center(
+          child: Column(
             children: [
               Row(
                 children: [
@@ -73,7 +75,36 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ],
               ),
             ],
-          )),
-        ));
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChatScreen()),
+          );
+        },
+        backgroundColor: primaryColor,
+        child: Icon(
+          Icons.android_outlined,
+          color: Colors.white,
+        ),
+      ),
+      floatingActionButtonLocation: MiddleRightFloatingActionButtonLocation(),
+    );
+  }
+}
+
+class MiddleRightFloatingActionButtonLocation
+    extends FloatingActionButtonLocation {
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final double x = scaffoldGeometry.scaffoldSize.width - 88.0;
+    final double screenHeight = scaffoldGeometry.scaffoldSize.height;
+    final double buttonHeight = 56.0;
+    final double y = screenHeight / 6 -
+        buttonHeight / 2; // Position between middle and bottom
+    return Offset(x, y);
   }
 }

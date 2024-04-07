@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:on_spot_mechanic/pages/authentication_module/profile_selection_page.dart';
+import 'package:on_spot_mechanic/pages/mechanic_module/mechanic_home.dart';
 
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
@@ -154,10 +155,30 @@ class _OtpScreenState extends State<OtpScreen> {
                 }
               else
                 {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProfileSelectionPage()))
+                  ap.checkExistingMechanic().then((value) => {
+                        if (value == true)
+                          {
+                            ap.getMechanicDataFromFirestore().then((value) => ap
+                                .saveMechanicDataToSP()
+                                .then((value) => ap.setSignIn().then(
+                                      (value) => Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MechanicHomeScreen(),
+                                          ),
+                                          (route) => false),
+                                    )))
+                          }
+                        else
+                          {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProfileSelectionPage()))
+                          }
+                      })
                 }
             });
       },

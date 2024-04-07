@@ -20,13 +20,14 @@ class AuthorizationProvider extends ChangeNotifier {
   String? _uid;
   String get uid => _uid!;
 
-  late UserModel _userModel = UserModel(
-    name: 'John Doe',
-    email: 'john@example.com',
-    createdAt: DateTime.now().toString(),
-    phoneNumber: '1234567890',
-    uid: 'user123',
-  );
+  // late UserModel _userModel = UserModel(
+  //   name: 'John Doe',
+  //   email: 'john@example.com',
+  //   createdAt: DateTime.now().toString(),
+  //   phoneNumber: '1234567890',
+  //   uid: 'user123',
+  // );
+  late UserModel _userModel;
   UserModel get userModel => _userModel;
 
   late MechanicModel _mechanicModel;
@@ -164,6 +165,7 @@ class AuthorizationProvider extends ChangeNotifier {
 //check if user is registered
   Future<bool> checkExistingUser() async {
     DocumentSnapshot snapshot = await store.collection("users").doc(_uid).get();
+
     if (snapshot.exists) {
       return true;
     } else {
