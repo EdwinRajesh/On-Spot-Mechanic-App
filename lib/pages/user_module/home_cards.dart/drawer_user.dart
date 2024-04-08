@@ -18,8 +18,6 @@ class UserDrawer extends StatelessWidget {
         context,
         listen: false);
     return SizedBox(
-      width: 200,
-      height: 400,
       child: Drawer(
         backgroundColor: Colors.white,
         child: Column(
@@ -51,57 +49,31 @@ class UserDrawer extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 25.0),
                   child: ListTile(
-                    title: const Text("H O M E"),
+                    title: const Text(
+                      "H O M E",
+                      style: TextStyle(color: Color(0xFF222831)),
+                    ),
                     leading: const Icon(Icons.home),
                     onTap: () {
                       Navigator.pop(context);
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 25.0),
-                  child: ListTile(
-                    title: const Text("S E T T I N G S"),
-                    leading: const Icon(Icons.settings),
-                    onTap: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => const SettingsPa()));
-                    },
-                  ),
-                ),
+
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 25.0),
+                //   child: ListTile(
+                //     title: const Text("S E T T I N G S"),
+                //     leading: const Icon(Icons.settings),
+                //     onTap: () {
+                //       // Navigator.push(
+                //       //     context,
+                //       //     MaterialPageRoute(
+                //       //         builder: (context) => const SettingsPa()));
+                //     },
+                //   ),
+                // ),
               ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 25.0, bottom: 25.0),
-              child: ListTile(
-                leading: GestureDetector(
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.exit_to_app,
-                          color: secondaryColor,
-                          size: 24,
-                        ),
-                        onPressed: () {
-                          ap.userSignOut();
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => WelcomePage()),
-                          );
-                        },
-                      ),
-                      Text(
-                        "L O G O U T ",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           ],
         ),
