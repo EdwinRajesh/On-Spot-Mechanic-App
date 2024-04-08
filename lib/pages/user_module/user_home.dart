@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:on_spot_mechanic/providers/auth_provider.dart'
     as MyAppAuthorizationProvider;
 
+import '../authentication_module/welcome.dart';
 import '../chat_bot.dart';
 import 'user_profile.dart';
 import 'user_vehicle.dart';
@@ -31,7 +32,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return Scaffold(
         drawer: UserDrawer(),
         appBar: AppBar(
-          actions: [],
+          title: Text('Your Title'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.exit_to_app),
+              onPressed: () {
+                ap.userSignOut();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => WelcomePage()));
+                // Add your logout logic here
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Padding(

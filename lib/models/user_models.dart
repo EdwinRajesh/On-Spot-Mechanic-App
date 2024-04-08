@@ -1,6 +1,7 @@
 class UserModel {
   String name;
   String email;
+  String profilePic;
 
   String createdAt;
   String? phoneNumber;
@@ -9,6 +10,7 @@ class UserModel {
   UserModel({
     required this.name,
     required this.email,
+    required this.profilePic,
     required this.createdAt,
     required this.phoneNumber,
     required this.uid,
@@ -22,6 +24,7 @@ class UserModel {
       uid: map['uid'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
       createdAt: map['createdAt'] ?? '',
+      profilePic: map['profilePic'] ?? '',
     );
   }
 
@@ -31,6 +34,7 @@ class UserModel {
       "name": name,
       "email": email,
       "uid": uid,
+      "profilePic": profilePic,
       "phoneNumber": phoneNumber,
       "createdAt": createdAt,
     };

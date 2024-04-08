@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:on_spot_mechanic/providers/auth_provider.dart'
+    as MyAppAuthorizationProvider;
+import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
 import 'user_home.dart';
@@ -17,10 +20,42 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final ap = Provider.of<MyAppAuthorizationProvider.AuthorizationProvider>(
+        context,
+        listen: false);
     return Scaffold(
         body: Center(
-          child: Container(decoration: BoxDecoration(), child: Text('Profile')),
-        ),
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              backgroundColor: primaryColor,
+              backgroundImage: NetworkImage(ap.userModel.profilePic),
+              radius: 64,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              ap.userModel.name,
+              style: TextStyle(
+                  fontSize: 28,
+                  color: secondaryColor,
+                  fontWeight: FontWeight.bold),
+            ),
+            Text(
+              ap.userModel.email,
+              style: TextStyle(
+                fontSize: 22,
+                color: tertiaryColor,
+              ),
+            ),
+            Text(
+              ap.userModel.phoneNumber ?? "",
+              style: TextStyle(
+                  fontSize: 20, color: silver, fontWeight: FontWeight.bold),
+            )
+          ],
+        )),
         bottomNavigationBar: Container(
           color: secondaryColor,
           child: Padding(

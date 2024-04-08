@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,6 +38,8 @@ class AuthorizationProvider extends ChangeNotifier {
   static final FirebaseAuth auth1 = FirebaseAuth.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore store = FirebaseFirestore.instance;
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+
   AuthorizationProvider() {
     checkSignIn();
   }
@@ -116,16 +120,57 @@ class AuthorizationProvider extends ChangeNotifier {
   }
 
   //DATABASE OPERATIONS
-  void saveUserDataToFirebase(
+  void saveMechanicDataToFirebase(
       {required BuildContext context,
-      required UserModel userModel,
+      required File profilePic,
+      required MechanicModel mechanicModel,
       required Function OnSuccess}) async {
     _isLoading = true;
     notifyListeners();
     try {
-      userModel.createdAt = DateTime.now().millisecondsSinceEpoch.toString();
-      userModel.phoneNumber = auth.currentUser?.phoneNumber;
-      userModel.uid = auth.currentUser?.phoneNumber;
+      await storeFileToStorage("mechanic/profilePic/$_uid", profilePic)
+          .then((value) {
+        mechanicModel.profilePic = value;
+
+        mechanicModel.createdAt =
+            DateTime.now().millisecondsSinceEpoch.toString();
+        mechanicModel.phoneNumber = auth.currentUser?.phoneNumber;
+        mechanicModel.uid = auth.currentUser?.phoneNumber;
+      });
+      _mechanicModel = mechanicModel;
+
+      //upload to db
+      await store
+          .collection('mechanic')
+          .doc(_uid)
+          .set(mechanicModel.toMap())
+          .then((value) {
+        OnSuccess();
+        _isLoading = false;
+        notifyListeners();
+      });
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message.toString());
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void saveUserDataToFirebase(
+      {required BuildContext context,
+      required UserModel userModel,
+      required File profilePic,
+      required Function OnSuccess}) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await storeFileToStorage("profilePic/$_uid", profilePic).then((value) {
+        userModel.profilePic = value;
+
+        userModel.createdAt = DateTime.now().millisecondsSinceEpoch.toString();
+        userModel.phoneNumber = auth.currentUser?.phoneNumber;
+        userModel.uid = auth.currentUser?.phoneNumber;
+      });
       _userModel = userModel;
 
       //upload to db
@@ -145,6 +190,13 @@ class AuthorizationProvider extends ChangeNotifier {
     }
   }
 
+  Future<String> storeFileToStorage(String ref, File file) async {
+    UploadTask uploadTask = _firebaseStorage.ref().child(ref).putFile(file);
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
   Future getDataFromFirestore() async {
     await store
         .collection("users")
@@ -155,6 +207,7 @@ class AuthorizationProvider extends ChangeNotifier {
         name: snapshot['name'],
         email: snapshot['email'],
         createdAt: snapshot['createdAt'],
+        profilePic: snapshot['profilePic'],
         uid: snapshot['uid'],
         phoneNumber: snapshot['phoneNumber'],
       );
@@ -187,35 +240,6 @@ class AuthorizationProvider extends ChangeNotifier {
   }
 
   //Mechanic
-  void saveMechanicDataToFirebase(
-      {required BuildContext context,
-      required MechanicModel mechanicModel,
-      required Function OnSuccess}) async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      mechanicModel.createdAt =
-          DateTime.now().millisecondsSinceEpoch.toString();
-      mechanicModel.phoneNumber = auth.currentUser?.phoneNumber;
-      mechanicModel.uid = auth.currentUser?.phoneNumber;
-      _mechanicModel = mechanicModel;
-
-      //upload to db
-      await store
-          .collection('mechanic')
-          .doc(_uid)
-          .set(mechanicModel.toMap())
-          .then((value) {
-        OnSuccess();
-        _isLoading = false;
-        notifyListeners();
-      });
-    } on FirebaseAuthException catch (e) {
-      showSnackBar(context, e.message.toString());
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
 
   Future saveMechanicDataToSP() async {
     SharedPreferences s = await SharedPreferences.getInstance();
@@ -250,6 +274,8 @@ class AuthorizationProvider extends ChangeNotifier {
         name: snapshot['name'],
         email: snapshot['email'],
         createdAt: snapshot['createdAt'],
+        profilePic: snapshot['profilePic'],
+        qualification: snapshot['qualification'],
         uid: snapshot['uid'],
         phoneNumber: snapshot['phoneNumber'],
       );

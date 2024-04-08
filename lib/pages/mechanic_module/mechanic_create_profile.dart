@@ -1,29 +1,34 @@
 // ignore_for_file: prefer_const_constructors
+
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/providers/auth_provider.dart';
-import 'package:on_spot_mechanic/pages/user_module/user_home.dart';
-
+import 'package:on_spot_mechanic/pages/mechanic_module/mechanic_home.dart';
+import 'package:on_spot_mechanic/providers/auth_provider.dart'
+    as MyAppAuthorizationProvider;
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
-import '../../models/user_models.dart';
+import '../../models/mechanic_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../utils/button.dart';
 import '../../utils/colors.dart';
 import '../../utils/signup_textfield.dart';
 import '../../utils/utils.dart';
 
-class UserProfile extends StatefulWidget {
-  const UserProfile({super.key});
+class MechanicProfile extends StatefulWidget {
+  const MechanicProfile({super.key});
 
   @override
-  State<UserProfile> createState() => _UserProfileState();
+  State<MechanicProfile> createState() => _MechanicProfileState();
 }
 
-class _UserProfileState extends State<UserProfile> {
+class _MechanicProfileState extends State<MechanicProfile> {
   File? image;
+
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController qualificationController = TextEditingController();
 
   @override
   void dispose() {
@@ -44,13 +49,14 @@ class _UserProfileState extends State<UserProfile> {
           leading: GestureDetector(
             child: Icon(Icons.arrow_back),
             onTap: () {
-              AuthorizationProvider auth = AuthorizationProvider();
+              AuthorizationProvider auth =
+                  MyAppAuthorizationProvider.AuthorizationProvider();
               auth.userSignOut();
             },
           ),
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(28, 40, 28, 40),
               child: Column(
@@ -103,6 +109,13 @@ class _UserProfileState extends State<UserProfile> {
                       controller: emailController,
                       icon: Icons.email_outlined),
                   SizedBox(
+                    height: 8,
+                  ),
+                  SignTextField(
+                      hintText: "Education",
+                      controller: qualificationController,
+                      icon: Icons.cast_for_education),
+                  SizedBox(
                     height: 16,
                   ),
                   CustomButton(
@@ -119,24 +132,26 @@ class _UserProfileState extends State<UserProfile> {
 
   void storeData() async {
     final ap = Provider.of<AuthorizationProvider>(context, listen: false);
-    UserModel userModel = UserModel(
+    MechanicModel mechanicModel = MechanicModel(
+        qualification: qualificationController.text.trim(),
         email: emailController.text.trim(),
         name: nameController.text.trim(),
         phoneNumber: "",
         profilePic: "",
         createdAt: '',
         uid: '');
-    ap.saveUserDataToFirebase(
+
+    ap.saveMechanicDataToFirebase(
         context: context,
         OnSuccess: () {
-          ap.saveUserDataToSP().then((value) => ap.setSignIn().then((value) =>
-              Navigator.pushAndRemoveUntil(
+          ap.saveMechanicDataToSP().then((value) => ap.setSignIn().then(
+              (value) => Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const UserHomeScreen()),
+                      builder: (context) => const MechanicHomeScreen()),
                   (route) => false)));
         },
-        userModel: userModel,
+        mechanicModel: mechanicModel,
         profilePic: image!);
   }
 }

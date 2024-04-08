@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:on_spot_mechanic/providers/auth_provider.dart'
@@ -58,7 +60,6 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
             children: [
               Row(
                 children: [
-                  // ignore: prefer_const_constructors
                   Text(
                     "Hey, ",
                     style: TextStyle(fontSize: 20),
@@ -73,6 +74,34 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 128,
+              ),
+              CircleAvatar(
+                backgroundColor: primaryColor,
+                backgroundImage: NetworkImage(ap.mechanicModel.profilePic),
+                radius: 64,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                ap.mechanicModel.name,
+                style: TextStyle(
+                    fontSize: 28,
+                    color: secondaryColor,
+                    fontWeight: FontWeight.bold),
+              ),
+              Text(
+                ap.mechanicModel.email,
+                style: TextStyle(
+                  fontSize: 22,
+                  color: tertiaryColor,
+                ),
+              ),
+              Text(
+                ap.mechanicModel.phoneNumber ?? "",
+                style: TextStyle(
+                    fontSize: 20, color: silver, fontWeight: FontWeight.bold),
+              )
             ],
           )),
         ));
