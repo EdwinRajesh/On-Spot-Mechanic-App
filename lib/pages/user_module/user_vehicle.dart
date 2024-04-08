@@ -2,31 +2,41 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:on_spot_mechanic/pages/user_module/user_home.dart';
 
 import '../../utils/colors.dart';
-import 'user_home.dart';
-import 'user_vehicle.dart';
+import 'user_add_vehicle.dart';
+import 'user_profile.dart';
 
-class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({super.key});
+class UserVehiclePage extends StatefulWidget {
+  const UserVehiclePage({super.key});
 
   @override
-  State<UserProfilePage> createState() => _UserProfilePageState();
+  State<UserVehiclePage> createState() => _UserVehiclePageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
+class _UserVehiclePageState extends State<UserVehiclePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-          child: Container(decoration: BoxDecoration(), child: Text('Profile')),
+          child: GestureDetector(
+            child: Container(
+                decoration: BoxDecoration(), child: Text('Add vehicle')),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserAddVehicle()),
+              );
+            },
+          ),
         ),
         bottomNavigationBar: Container(
           color: secondaryColor,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 16),
             child: GNav(
-              selectedIndex: 2,
+              selectedIndex: 0,
               backgroundColor: secondaryColor,
               color: Colors.white,
               activeColor: primaryColor,
@@ -58,6 +68,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 GButton(
                   icon: Icons.person,
                   text: "Profile",
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UserProfilePage()),
+                    );
+                  },
                 ),
               ],
             ),

@@ -7,7 +7,7 @@ import 'package:on_spot_mechanic/pages/authentication_module/welcome.dart';
 import '../../utils/colors.dart';
 import '../../utils/utils.dart';
 import '../mechanic_module/mechanic_profile.dart';
-import '../user_module/user_profile.dart';
+import '../user_module/user_create_profile.dart';
 
 class ProfileSelectionPage extends StatefulWidget {
   const ProfileSelectionPage({super.key});
