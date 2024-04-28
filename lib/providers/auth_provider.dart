@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/car_model.dart';
 import '../models/mechanic_model.dart';
 import '../pages/authentication_module/otp_screen.dart';
 import '../utils/utils.dart';
@@ -29,11 +30,15 @@ class AuthorizationProvider extends ChangeNotifier {
   //   phoneNumber: '1234567890',
   //   uid: 'user123',
   // );
+
   late UserModel _userModel;
   UserModel get userModel => _userModel;
 
   late MechanicModel _mechanicModel;
   MechanicModel get mechanicModel => _mechanicModel;
+
+  late CarModel _carModel;
+  CarModel get carModel => _carModel;
 
   static final FirebaseAuth auth1 = FirebaseAuth.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -109,7 +114,7 @@ class AuthorizationProvider extends ChangeNotifier {
           verificationId: verificationId, smsCode: userOtp);
       User? user = (await auth.signInWithCredential(creds)).user!;
 
-      _uid = user.uid;
+      _uid = user.phoneNumber;
       onSuccess();
 
       _isLoading = false;
@@ -120,6 +125,8 @@ class AuthorizationProvider extends ChangeNotifier {
   }
 
   //DATABASE OPERATIONS
+  //*************************SAVE DATA TO FIREBASE*********************** */
+
   void saveMechanicDataToFirebase(
       {required BuildContext context,
       required File profilePic,
@@ -156,27 +163,33 @@ class AuthorizationProvider extends ChangeNotifier {
     }
   }
 
-  void saveUserDataToFirebase(
-      {required BuildContext context,
-      required UserModel userModel,
-      required File profilePic,
-      required Function OnSuccess}) async {
+  void saveUserDataToFirebase({
+    required BuildContext context,
+    required UserModel userModel,
+    required File profilePic,
+    required Function OnSuccess,
+  }) async {
     _isLoading = true;
     notifyListeners();
     try {
-      await storeFileToStorage("profilePic/$_uid", profilePic).then((value) {
+      await storeFileToStorage(
+              "user/$_uid/profilePicture/${DateTime.now().millisecondsSinceEpoch}",
+              profilePic)
+          .then((value) {
         userModel.profilePic = value;
-
         userModel.createdAt = DateTime.now().millisecondsSinceEpoch.toString();
         userModel.phoneNumber = auth.currentUser?.phoneNumber;
-        userModel.uid = auth.currentUser?.phoneNumber;
+        // Use Firebase Authentication UID as document ID
+        // _uid = auth.currentUser?.uid;
+        _uid = userModel.phoneNumber;
+        userModel.uid = _uid;
       });
       _userModel = userModel;
 
       //upload to db
       await store
           .collection('users')
-          .doc(_uid)
+          .doc(_uid) // Use Firebase Authentication UID as document ID
           .set(userModel.toMap())
           .then((value) {
         OnSuccess();
@@ -190,17 +203,55 @@ class AuthorizationProvider extends ChangeNotifier {
     }
   }
 
-  Future<String> storeFileToStorage(String ref, File file) async {
-    UploadTask uploadTask = _firebaseStorage.ref().child(ref).putFile(file);
-    TaskSnapshot snapshot = await uploadTask;
-    String downloadUrl = await snapshot.ref.getDownloadURL();
-    return downloadUrl;
+  void saveCarDataToFirebase(
+      {required BuildContext context,
+      required List<File> carPictures, // Updated parameter to accept a list
+      required CarModel carModel,
+      required Function OnSuccess}) async {
+    _isLoading = true;
+    notifyListeners();
+    _carModel = carModel;
+
+    try {
+      // Upload each car picture to storage
+      List<String> uploadedPictureUrls = [];
+      for (File picture in carPictures) {
+        String pictureUrl = await storeFileToStorage(
+          "user/$_uid/carPictures/${DateTime.now().millisecondsSinceEpoch}",
+          picture,
+        );
+        uploadedPictureUrls.add(pictureUrl);
+      }
+
+      // Update carModel with list of picture URLs
+      carModel.carPictures = uploadedPictureUrls;
+      carModel.uid = auth.currentUser?.phoneNumber;
+
+      // Upload carModel to Firestore
+      await store
+          .collection('users')
+          .doc(_uid)
+          .collection('user_car')
+          .doc()
+          .set(carModel.toMap())
+          .then((value) {
+        OnSuccess();
+        _isLoading = false;
+        notifyListeners();
+      });
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message.toString());
+      _isLoading = false;
+      notifyListeners();
+    }
   }
+
+  //*************************GET DATA FROM FIRESTORE
 
   Future getDataFromFirestore() async {
     await store
         .collection("users")
-        .doc(auth.currentUser!.uid)
+        .doc(auth.currentUser!.phoneNumber)
         .get()
         .then((DocumentSnapshot snapshot) {
       _userModel = UserModel(
@@ -211,13 +262,77 @@ class AuthorizationProvider extends ChangeNotifier {
         uid: snapshot['uid'],
         phoneNumber: snapshot['phoneNumber'],
       );
-      _uid = userModel.uid;
+      _uid = snapshot['phoneNumber'];
     });
   }
 
-//check if user is registered
+  Future<List<CarModel>> getCarDataFromFirestore() async {
+    List<CarModel> carList = [];
+    try {
+      QuerySnapshot querySnapshot = await store
+          .collection('users')
+          .doc(_uid)
+          .collection('user_car')
+          .get();
+      querySnapshot.docs.forEach((DocumentSnapshot snapshot) {
+        CarModel carModel = CarModel(
+          manufacture: snapshot['manufacture'],
+          carPictures: List<String>.from(
+              snapshot['carPictures']), // Updated to parse list of strings
+          fuel: snapshot['fuel'],
+          model: snapshot['model'],
+          year: snapshot['year'],
+          uid: snapshot['uid'],
+        );
+        _uid = carModel.uid;
+        carList.add(carModel);
+      });
+
+      // Initialize _carModel with the first item in the list if it's not empty
+      if (carList.isNotEmpty) {
+        _carModel = carList.first;
+      } else {
+        print("no store car found");
+        throw Exception('No car data found');
+      }
+    } catch (e) {
+      print('Error fetching car data from Firestore: $e');
+    }
+    return carList;
+  }
+
+  Future getMechanicDataFromFirestore() async {
+    await store
+        .collection("mechanic")
+        .doc(auth.currentUser!.phoneNumber)
+        .get()
+        .then((DocumentSnapshot snapshot) {
+      _mechanicModel = MechanicModel(
+        name: snapshot['name'],
+        email: snapshot['email'],
+        createdAt: snapshot['createdAt'],
+        profilePic: snapshot['profilePic'],
+        qualification: snapshot['qualification'],
+        uid: snapshot['uid'],
+        phoneNumber: snapshot['phoneNumber'],
+      );
+      _uid = mechanicModel.uid;
+    });
+  }
+
+  Future<String> storeFileToStorage(String ref, File file) async {
+    UploadTask uploadTask = _firebaseStorage.ref().child(ref).putFile(file);
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+//************************ CHECK USER AND MECHANIC EXISTS */
   Future<bool> checkExistingUser() async {
-    DocumentSnapshot snapshot = await store.collection("users").doc(_uid).get();
+    DocumentSnapshot snapshot = await store
+        .collection("users")
+        .doc(auth.currentUser?.phoneNumber)
+        .get();
 
     if (snapshot.exists) {
       return true;
@@ -225,6 +340,20 @@ class AuthorizationProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> checkExistingMechanic() async {
+    DocumentSnapshot snapshot = await store
+        .collection("mechanic")
+        .doc(auth.currentUser?.phoneNumber)
+        .get();
+    if (snapshot.exists) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //****************     SHARED PREFERENCES   ***************/
 
   Future saveUserDataToSP() async {
     SharedPreferences s = await SharedPreferences.getInstance();
@@ -239,8 +368,6 @@ class AuthorizationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  //Mechanic
-
   Future saveMechanicDataToSP() async {
     SharedPreferences s = await SharedPreferences.getInstance();
     await s.setString("mechanic_model", jsonEncode(mechanicModel.toMap()));
@@ -254,32 +381,32 @@ class AuthorizationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> checkExistingMechanic() async {
-    DocumentSnapshot snapshot =
-        await store.collection("mechanic").doc(_uid).get();
-    if (snapshot.exists) {
-      return true;
-    } else {
-      return false;
-    }
+  Future<void> saveCarDataToSP(List<CarModel> carList) async {
+    SharedPreferences s = await SharedPreferences.getInstance();
+    // Convert the list of CarModel objects to JSON strings
+    List<String> jsonList =
+        carList.map((car) => jsonEncode(car.toMap())).toList();
+    // Save the JSON list to shared preferences
+    await s.setStringList("car_list", jsonList);
   }
 
-  Future getMechanicDataFromFirestore() async {
-    await store
-        .collection("mechanic")
-        .doc(auth.currentUser!.uid)
-        .get()
-        .then((DocumentSnapshot snapshot) {
-      _mechanicModel = MechanicModel(
-        name: snapshot['name'],
-        email: snapshot['email'],
-        createdAt: snapshot['createdAt'],
-        profilePic: snapshot['profilePic'],
-        qualification: snapshot['qualification'],
-        uid: snapshot['uid'],
-        phoneNumber: snapshot['phoneNumber'],
-      );
-      _uid = mechanicModel.uid;
-    });
+  Future<List<CarModel>> getCarDataFromSP() async {
+    SharedPreferences s = await SharedPreferences.getInstance();
+    List<String>? jsonList = s.getStringList("car_list");
+    if (jsonList != null) {
+      List<CarModel> carList =
+          jsonList.map((json) => CarModel.fromMap(jsonDecode(json))).toList();
+      if (carList.isNotEmpty) {
+        _carModel = carList.first;
+        _uid = _carModel.uid;
+        notifyListeners();
+        print("Sharde Preference found car");
+      }
+      return carList;
+    } else {
+      print("Sharde Preference no car");
+      // Return an empty list or null
+      return [];
+    }
   }
 }

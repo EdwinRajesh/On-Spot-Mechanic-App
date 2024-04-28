@@ -32,8 +32,10 @@ class MechanicModel {
   // to map
   Map<String, dynamic> toMap() {
     return {
+      "qualification": qualification,
       "name": name,
       "email": email,
+      "profilePic": profilePic,
       "uid": uid,
       "phoneNumber": phoneNumber,
       "createdAt": createdAt,

@@ -32,11 +32,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// class CheckUserLoggedIn extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     final AuthorizationProvider = Provider.of<AuthorizationProvider>(context);
-//     return AuthorizationProvider.isSignedIn ? UserHomeScreen() : WelcomePage();
-//   }
-// }

@@ -21,7 +21,7 @@ class SignTextField extends StatefulWidget {
 class _SignTextFieldState extends State<SignTextField> {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return TextField(
       controller: widget.controller,
       cursorColor: primaryColor,
       decoration: InputDecoration(
@@ -33,11 +33,6 @@ class _SignTextFieldState extends State<SignTextField> {
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
-      onTap: () {
-        setState(() {
-          InputDecoration(labelText: widget.hintText);
-        });
-      },
     );
   }
 }

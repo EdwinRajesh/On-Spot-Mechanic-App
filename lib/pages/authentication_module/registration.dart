@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:on_spot_mechanic/pages/authentication_module/login.dart';
 import 'package:on_spot_mechanic/pages/authentication_module/welcome.dart';
 import 'package:on_spot_mechanic/providers/auth_provider.dart'
     as MyAppAuthorizationProvider;
@@ -95,42 +94,42 @@ class _RegistrationState extends State<Registration> {
                 SizedBox(
                   height: 16,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 26.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    // ignore: prefer_const_literals_to_create_immutables
-                    children: [
-                      Text(
-                        "Have an account?",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black38,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()));
-                        },
-                        child: Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 26.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     // ignore: prefer_const_literals_to_create_immutables
+                //     children: [
+                //       Text(
+                //         "Have an account?",
+                //         style: TextStyle(
+                //           fontSize: 18,
+                //           color: Colors.black38,
+                //           fontWeight: FontWeight.bold,
+                //         ),
+                //       ),
+                //       SizedBox(
+                //         width: 8,
+                //       ),
+                //       GestureDetector(
+                //         onTap: () {
+                //           Navigator.push(
+                //               context,
+                //               MaterialPageRoute(
+                //                   builder: (context) => LoginPage()));
+                //         },
+                //         child: Text(
+                //           'Sign In',
+                //           style: TextStyle(
+                //             fontSize: 18,
+                //             color: primaryColor,
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //         ),
+                //       )
+                //     ],
+                //   ),
+                // )
               ],
             ),
           ),

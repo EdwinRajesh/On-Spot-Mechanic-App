@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
-import 'package:on_spot_mechanic/pages/user_module/user_home.dart';
+import 'package:on_spot_mechanic/pages/user_module/user_nav_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
@@ -44,29 +44,29 @@ class _WelcomePageState extends State<WelcomePage> {
               height: 24,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 56),
-              child: SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: CustomButton(
-                  text: 'Sign Up',
-                  onPressed: () async {
-                    if (ap.isSignedIn == true) {
-                      await ap.getDataFromSP().whenComplete(() =>
+                padding: EdgeInsets.symmetric(horizontal: 56),
+                child: SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                    child: CustomButton(
+                      text: 'Sign Up',
+                      onPressed: () async {
+                        if (ap.isSignedIn == true) {
+                          await ap.getDataFromSP().whenComplete(() async =>
+                              await ap.getCarDataFromSP().whenComplete(() =>
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              UserNavPage()))));
+                        } else {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => UserHomeScreen())));
-                    } else {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Registration()));
-                    }
-                  },
-                ),
-              ),
-            )
+                                  builder: (context) => const Registration()));
+                        }
+                      },
+                    )))
           ],
         ),
       )),

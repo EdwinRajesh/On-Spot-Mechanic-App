@@ -1,7 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:on_spot_mechanic/providers/auth_provider.dart'
+    as MyAppAuthorizationProvider;
+import 'package:provider/provider.dart';
 import 'package:on_spot_mechanic/utils/colors.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -13,6 +17,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _userMessage = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   static const apiKey = 'AIzaSyA8FHucgMMgJUxMTdqFq7m_Bxcbmb5bbgU';
@@ -41,6 +47,20 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -56,6 +76,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
@@ -63,7 +84,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   isLoading: isLoading,
                   isUser: message.isUser,
                   message: message.message,
-                  // date: DateFormat('HH:mm').format(message.date)
                 );
               },
             ),
@@ -88,6 +108,20 @@ class _ChatScreenState extends State<ChatScreen> {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       hintText: 'Message ChatBot...',
+                      suffixIcon: isLoading
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                height: 16,
+                                width: 8,
+                                child: CircularProgressIndicator(
+                                  color: primaryColor,
+                                  strokeWidth: 4,
+                                  // Adjust the thickness as needed
+                                ),
+                              ),
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -105,6 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     icon: const Icon(Icons.send),
                     onPressed: () {
                       sendMessage();
+                      _scrollToBottom();
                     },
                   ),
                 ),
@@ -121,70 +156,88 @@ class Messages extends StatelessWidget {
   final bool isUser;
   final String message;
   final bool isLoading;
-  // final String date;
 
   const Messages(
       {super.key,
       required this.isUser,
       required this.message,
-      required this.isLoading
-      // required this.date
-      });
+      required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
+    final ap = Provider.of<MyAppAuthorizationProvider.AuthorizationProvider>(
+        context,
+        listen: false);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // if (isLoading && !isUser)
-          //   Padding(
-          //     padding: const EdgeInsets.only(top: 8),
-          //     child: SizedBox(
-          //       width: 16,
-          //       height: 16,
-          //       child: CircularProgressIndicator(
-          //         strokeWidth: 4,
-          //         color: secondaryColor, // Adjust the thickness of the circle
-          //         // Use the color animation
-          //       ),
-          //     ),
-          //   ),
-          if (isUser)
-            Text(
-              "YOU",
-              style: TextStyle(
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
+          isUser
+              ? CircleAvatar(
+                  backgroundColor: primaryColor,
+                  backgroundImage: NetworkImage(ap.userModel.profilePic),
+                  radius: 10,
+                )
+              : Container(
+                  width: 20, // Adjust width and height to control the size
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: secondaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.android, // Replace with your desired icon
+                    color: Colors.white, // Adjust icon color as needed
+                    size: 12, // Adjust icon size as needed
+                  ),
+                ),
+          SizedBox(
+            width: 8,
+          ),
+          Expanded(
+            flex: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // if (isLoading && !isUser)
+                //   Padding(
+                //     padding: const EdgeInsets.only(top: 8),
+                //     child: SizedBox(
+                //       width: 16,
+                //       height: 16,
+                //       child: CircularProgressIndicator(
+                //         strokeWidth: 4,
+                //         color:
+                //             secondaryColor, // Adjust the thickness of the circle
+                //         // Use the color animation
+                //       ),
+                //     ),
+                //   ),
+                if (isUser)
+                  Text(
+                    "YOU",
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                if (!isUser)
+                  Text(
+                    "MECHBOT",
+                    style: TextStyle(
+                      color: secondaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                Text(
+                  message,
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ],
             ),
-          if (!isUser)
-            Text(
-              "MECHBOT",
-              style: TextStyle(
-                color: secondaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          // if (isLoading)
-          //   Padding(
-          //     padding: const EdgeInsets.only(top: 8),
-          //     child: SizedBox(
-          //       width: 16,
-          //       height: 16,
-          //       child: CircularProgressIndicator(
-          //         strokeWidth: 4,
-          //         color: secondaryColor, // Adjust the thickness of the circle
-          //         // Use the color animation
-          //       ),
-          //     ),
-          //   ),
-          Text(
-            message,
-            style: TextStyle(fontSize: 16, color: Colors.black),
           ),
         ],
       ),
@@ -195,11 +248,9 @@ class Messages extends StatelessWidget {
 class Message {
   final bool isUser;
   final String message;
-  // final DateTime date;
 
   Message({
     required this.isUser,
     required this.message,
-    // required this.date,
   });
 }

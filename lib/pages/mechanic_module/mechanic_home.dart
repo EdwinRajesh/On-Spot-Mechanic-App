@@ -101,6 +101,11 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
                 ap.mechanicModel.phoneNumber ?? "",
                 style: TextStyle(
                     fontSize: 20, color: silver, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                ap.mechanicModel.qualification,
+                style: TextStyle(
+                    fontSize: 20, color: silver, fontWeight: FontWeight.bold),
               )
             ],
           )),
