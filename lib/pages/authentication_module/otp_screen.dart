@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:on_spot_mechanic/pages/authentication_module/profile_selection_page.dart';
 import 'package:on_spot_mechanic/pages/mechanic_module/mechanic_home.dart';
-import 'package:on_spot_mechanic/pages/user_module/user_nav_screen.dart';
 
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,7 @@ import '../../providers/auth_provider.dart';
 import '../../utils/button.dart';
 import '../../utils/colors.dart';
 import '../../utils/utils.dart';
+import '../user_module/user_cards/user_nav_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final String verificationId;
@@ -171,7 +171,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const MechanicHomeScreen(),
+                                                MechanicHomeScreen(),
                                           ),
                                           (route) => false),
                                     )))

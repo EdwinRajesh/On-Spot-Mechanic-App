@@ -23,15 +23,16 @@ class AuthorizationProvider extends ChangeNotifier {
   String? _uid;
   String get uid => _uid!;
 
-  // late UserModel _userModel = UserModel(
-  //   name: 'John Doe',
-  //   email: 'john@example.com',
-  //   createdAt: DateTime.now().toString(),
-  //   phoneNumber: '1234567890',
-  //   uid: 'user123',
-  // );
+  late UserModel _userModel = UserModel(
+    name: 'John Doe',
+    email: 'john@example.com',
+    createdAt: DateTime.now().toString(),
+    phoneNumber: '1234567890',
+    uid: 'user123',
+    profilePic: '',
+  );
 
-  late UserModel _userModel;
+  //late UserModel _userModel;
   UserModel get userModel => _userModel;
 
   late MechanicModel _mechanicModel;
@@ -301,7 +302,7 @@ class AuthorizationProvider extends ChangeNotifier {
     return carList;
   }
 
-  Future getMechanicDataFromFirestore() async {
+  Future<void> getMechanicDataFromFirestore() async {
     await store
         .collection("mechanic")
         .doc(auth.currentUser!.phoneNumber)
@@ -315,6 +316,10 @@ class AuthorizationProvider extends ChangeNotifier {
         qualification: snapshot['qualification'],
         uid: snapshot['uid'],
         phoneNumber: snapshot['phoneNumber'],
+        is4WheelRepairSelected: snapshot['is4WheelRepairSelected'],
+        is2WheelRepairSelected: snapshot['is2WheelRepairSelected'],
+        is6WheelRepairSelected: snapshot['is6WheelRepairSelected'],
+        isTowSelected: snapshot['isTowSelected'],
       );
       _uid = mechanicModel.uid;
     });

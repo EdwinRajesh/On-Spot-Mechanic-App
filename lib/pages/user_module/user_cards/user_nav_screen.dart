@@ -6,7 +6,8 @@ import 'package:on_spot_mechanic/pages/user_module/user_vehicle.dart';
 //import 'package:on_spot_mechanic/utils/colors.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:on_spot_mechanic/utils/colors.dart';
-import 'user_profile.dart';
+
+import '../user_profile.dart';
 
 class UserNavPage extends StatefulWidget {
   const UserNavPage({super.key});

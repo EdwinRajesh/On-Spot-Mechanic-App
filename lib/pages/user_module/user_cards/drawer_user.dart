@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:on_spot_mechanic/providers/auth_provider.dart'
     as MyAppAuthorizationProvider;
 
-import '../faq.dart';
+import 'faq.dart';
 
 class UserDrawer extends StatelessWidget {
   const UserDrawer({super.key});
@@ -75,7 +75,6 @@ class UserDrawer extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) => WelcomePage())));
-                      ;
                     },
                   ),
                 ),

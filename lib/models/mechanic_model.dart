@@ -6,15 +6,24 @@ class MechanicModel {
   String createdAt;
   String? phoneNumber;
   String? uid;
+  final bool is4WheelRepairSelected;
+  final bool is6WheelRepairSelected;
+  final bool is2WheelRepairSelected;
+  final bool isTowSelected;
 
-  MechanicModel(
-      {required this.name,
-      required this.email,
-      required this.createdAt,
-      required this.phoneNumber,
-      required this.uid,
-      required this.profilePic,
-      required this.qualification});
+  MechanicModel({
+    required this.name,
+    required this.email,
+    required this.createdAt,
+    required this.phoneNumber,
+    required this.uid,
+    required this.profilePic,
+    required this.qualification,
+    required this.is4WheelRepairSelected,
+    required this.is6WheelRepairSelected,
+    required this.is2WheelRepairSelected,
+    required this.isTowSelected,
+  });
 
   // from map
   factory MechanicModel.fromMap(Map<String, dynamic> map) {
@@ -26,6 +35,10 @@ class MechanicModel {
       createdAt: map['createdAt'] ?? '',
       profilePic: map['profilePic'] ?? '',
       qualification: map['qualification'] ?? '',
+      is4WheelRepairSelected: map['is4WheelRepairSelected'] ?? false,
+      is6WheelRepairSelected: map['is6WheelRepairSelected'] ?? false,
+      is2WheelRepairSelected: map['is2WheelRepairSelected'] ?? false,
+      isTowSelected: map['isTowSelected'] ?? false,
     );
   }
 
@@ -39,6 +52,10 @@ class MechanicModel {
       "uid": uid,
       "phoneNumber": phoneNumber,
       "createdAt": createdAt,
+      "is4WheelRepairSelected": is4WheelRepairSelected,
+      "is6WheelRepairSelected": is6WheelRepairSelected,
+      "is2WheelRepairSelected": is2WheelRepairSelected,
+      "isTowSelected": isTowSelected,
     };
   }
 }

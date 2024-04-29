@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, library_prefixes, unnecessary_string_interpolations, prefer_const_literals_to_create_immutables
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:on_spot_mechanic/pages/user_module/user_cards/card.dart';
 import 'package:on_spot_mechanic/pages/user_module/user_cards/drawer_user.dart';
 import 'package:on_spot_mechanic/utils/colors.dart';
@@ -9,6 +11,7 @@ import 'package:on_spot_mechanic/providers/auth_provider.dart'
     as MyAppAuthorizationProvider;
 
 import '../chat_bot.dart';
+import 'available_mechanics.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -54,22 +57,77 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    UserCard(
-                      name: "2 Wheel Repair",
-                      svgPath: 'assets/bike.svg',
+                    GestureDetector(
+                      child: UserCard(
+                        name: "2 Wheel Repair",
+                        svgPath: 'assets/bike.svg',
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NearbyMechanicsScreen(
+                              selectedService: 'is2WheelRepairSelected',
+                              serviceName: '2-Wheel Assistance',
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    UserCard(
-                      name: "4 Wheel Repair",
-                      svgPath: 'assets/car.svg',
+                    GestureDetector(
+                      child: UserCard(
+                        name: "4 Wheel Repair",
+                        svgPath: 'assets/car.svg',
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NearbyMechanicsScreen(
+                              selectedService: 'is4WheelRepairSelected',
+                              serviceName: '4-Wheel Assistance',
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    UserCard(
-                        name: "6 Wheel Repair", svgPath: 'assets/6wheel.svg'),
-                    UserCard(name: "Tow Service", svgPath: 'assets/tow.svg'),
+                    GestureDetector(
+                      child: UserCard(
+                          name: "6 Wheel Repair", svgPath: 'assets/6wheel.svg'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NearbyMechanicsScreen(
+                              selectedService: 'is6WheelRepairSelected',
+                              serviceName: '6-Wheel Assistance',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      child: UserCard(
+                        name: "Tow Service",
+                        svgPath: 'assets/tow.svg',
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NearbyMechanicsScreen(
+                              selectedService: 'isTowService',
+                              serviceName: 'Tow Service',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ],
