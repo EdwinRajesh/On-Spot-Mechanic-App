@@ -29,32 +29,13 @@ class ChatService {
     });
   }
 
-  Stream<List<Map<String, dynamic>>> getUserStream(String userID) {
-    return _firestore
-        .collection("chat_rooms")
-        .snapshots()
-        .asyncMap((chatRoomsSnapshot) async {
-      List<Map<String, dynamic>> userList = [];
+  Stream<List<Map<String, dynamic>>> getUserStream() {
+    return _firestore.collection("users").snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final user = doc.data();
 
-      for (var chatRoomDoc in chatRoomsSnapshot.docs) {
-        var messagesSnapshot = await chatRoomDoc.reference
-            .collection("messages")
-            .where("receiverID", isEqualTo: userID)
-            .get();
-
-        for (var messageDoc in messagesSnapshot.docs) {
-          var senderID = messageDoc["senderID"];
-          var userDataSnapshot =
-              await _firestore.collection("user").doc(senderID).get();
-
-          var userData = userDataSnapshot.data();
-          if (userData != null) {
-            userList.add(userData);
-          }
-        }
-      }
-
-      return userList;
+        return user;
+      }).toList();
     });
   }
 
@@ -63,7 +44,7 @@ class ChatService {
 
     if (currentUser != null) {
       final String currentUserID = currentUser.phoneNumber ?? '';
-      final String currentUserEmail = currentUser.email!;
+      final String currentUserEmail = currentUser.email ?? '';
       final Timestamp timestamp = Timestamp.now();
 
       Message newMessage = Message(

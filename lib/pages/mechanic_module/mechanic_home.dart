@@ -7,18 +7,19 @@ import 'package:on_spot_mechanic/providers/auth_provider.dart';
 import '../../providers/chat_services.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/user_tile.dart';
+import '../user_module/user_messaging.dart';
 
 class MechanicHomeScreen extends StatefulWidget {
   MechanicHomeScreen({super.key});
-
-  final ChatService chatService = ChatService();
-  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   State<MechanicHomeScreen> createState() => _MechanicHomeScreenState();
 }
 
 class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
+  final ChatService chatService = ChatService();
+  FirebaseAuth auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     final ap = Provider.of<AuthorizationProvider>(context, listen: false);
@@ -72,7 +73,7 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
                   ),
                 ],
               ),
-              // _buildUserList(),
+              _buildUserList(chatService, auth),
             ],
           ),
         ),
@@ -80,52 +81,54 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
     );
   }
 }
-//   Widget _buildUserList() {
-//     return StreamBuilder(
-//       //  stream: widget.chatService.getUserStream(),
-//         builder: (context, snapshot) {
-//           if (snapshot.hasError) {
-//             return const Text("Error");
-//           }
 
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return const Text("Loading");
-//           }
+Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {
+  return StreamBuilder(
+    stream: chatService.getUserStream(),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        return const Text("Error");
+      }
 
-//           return Container(
-//             height: 200,
-//             child: ListView(
-//               children: snapshot.data!
-//                   .map<Widget>(
-//                       (userData) => _buildUserListItem(userData, context))
-//                   .toList(),
-//             ),
-//           );
-//         });
-//   }
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Text("Loading");
+      }
 
-//   Widget _buildUserListItem(
-//       Map<String, dynamic> userData, BuildContext context) {
-//     if (userData["email"] != widget.auth.currentUser?.email) {
-//       return UserTile(
-//         text: userData["name"],
-//         onTap: () {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(
-//               builder: (context) => MechanicChatPage(
-//                 userEmail: userData["email"],
-//                 userID: userData["uid"],
-//               ),
-//             ),
-//           );
-//         },
-//       );
-//     } else {
-//       return Container();
-//     }
-//   }
-// }
+      return Container(
+        height: 200,
+        child: ListView(
+          children: snapshot.data!
+              .map<Widget>((userData) => _buildUserListItem(userData, context))
+              .toList(),
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  if (userData["email"] != auth.currentUser?.email) {
+    return UserTile(
+      text: userData["name"],
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              receiverEmail: userData["email"],
+              receiverID: userData["uid"],
+            ),
+          ),
+        );
+      },
+    );
+  } else {
+    return Container();
+  }
+}
+
 
 // class MechanicChatPage extends StatelessWidget {
 //   final String userEmail;

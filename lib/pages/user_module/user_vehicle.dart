@@ -88,61 +88,90 @@ class _UserVehiclePageState extends State<UserVehiclePage> {
                       itemCount: cars.length,
                       itemBuilder: (context, index) {
                         final car = cars[index];
-                        return ListTile(
-                          leading: car.carPictures.isNotEmpty
-                              ? Image.network(
-                                  car.carPictures[
-                                      0], // Display the first picture in the list
-                                  width: 60,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                )
-                              : Icon(Icons
-                                  .car_repair), // Display an icon if no pictures are available
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 1.0, // Adjust the width as needed
+                                color: Colors
+                                    .black, // Specify the color of the border
+                              ),
+                            ),
+                          ),
+                          child: GestureDetector(
+                            child: ListTile(
+                              leading: car.carPictures.isNotEmpty
+                                  ? Image.network(
+                                      car.carPictures[
+                                          0], // Display the first picture in the list
+                                      width: 60,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Icon(
+                                      Icons.car_repair,
+                                    ), // Display an icon if no pictures are available
 
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    capitalizeFirstLetter(car.manufacture),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: secondaryColor,
-                                        fontSize: 18),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        capitalizeFirstLetter(car.manufacture),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: secondaryColor,
+                                            fontSize: 18),
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Text(
+                                        capitalizeFirstLetter(car.model),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: secondaryColor,
+                                            fontSize: 18),
+                                      )
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
+                                  //Text('Reg. No : ${car.}'),
                                   Text(
-                                    capitalizeFirstLetter(car.model),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: secondaryColor,
-                                        fontSize: 18),
-                                  )
+                                    'Year: ${car.year}',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(customIcon),
+                                      Text(
+                                        car.fuel!,
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
-                              //Text('Reg. No : ${car.}'),
-                              Text(
-                                'Year: ${car.year}',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Row(
-                                children: [
-                                  Icon(customIcon),
-                                  Text(
-                                    car.fuel!,
-                                  )
-                                ],
-                              ),
-                              Divider(
-                                color: silver, // Set the color of the line
-                                thickness: 1.0, // Set the thickness of the line
-                                // Set the end padding of the line
-                              )
-                            ],
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Delete'),
+                                    content: Text('Dialog Content'),
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog
+                                        },
+                                        child: Text('Close'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
                         );
                       },
